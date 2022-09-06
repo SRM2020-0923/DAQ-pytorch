@@ -28,22 +28,22 @@ class EDSR(nn.Module):
         kernel_size = 3 
         scale = args.scale[0]
         act = nn.ReLU(True)
-        url_name = 'r{}f{}x{}'.format(n_resblocks, n_feats, scale)
+        url_name = 'r{}f{}x{}'.format(n_resblocks, n_feats, scale)    # 32, 256, 4
         if url_name in url:
             self.url = url[url_name]
         else:
             self.url = None
-        self.sub_mean = common.MeanShift(args.rgb_range)
+        self.sub_mean = common.MeanShift(args.rgb_range)              # 255
         self.add_mean = common.MeanShift(args.rgb_range, sign=1)
 
 
-        m_head = [conv(args.n_colors, n_feats, kernel_size)]
+        m_head = [conv(args.n_colors, n_feats, kernel_size)]          # n_colors = 3.  conv(3, 256, 3, padding=1, bias=True)
 
         m_body = [
             common.ResBlock(
                 conv, n_feats, kernel_size, a_bit=a_bit, w_bit=w_bit, qq_bit=qq_bit, finetune=args.finetune, with_BN=args.with_BN, act=act, res_scale=args.res_scale
             ) for _ in range(n_resblocks)
-        ]
+        ]                                                             # res_scale = 0.1
 
         m_body.append(conv(n_feats, n_feats, kernel_size))
 
